@@ -3,9 +3,10 @@ module Zebra
 
     attr_reader :printer
 
-    def initialize(printer, check_printer = false)
+    def initialize(printer, cups_ip = nil, check_printer = false)
       check_existent_printers printer if check_printer
       @printer = printer
+      @remote_ip = cups_ip
     end
 
     def print(label, ip)
