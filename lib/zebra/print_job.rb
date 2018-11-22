@@ -3,27 +3,31 @@ module Zebra
 
     attr_reader :printer
 
-    def initialize(printer, cups_ip = nil)
-      @printer_name = printer
-      @remote_ip = cups_ip
+    def initialize(printer, check_printer = false)
+      check_existent_printers printer if check_printer
+      @printer = printer
     end
 
-    def print(label)
-      #check_existent_printers @printer_name
+    def print(label, ip)
+      @remote_ip = ip
       tempfile = label.persist
       send_to_printer tempfile.path
     end
 
-    # Shows existing CUPS printers.
-    def cups_printers
-      Cups.show_destinations
+    def raw_print(zpl, ip)
+      @remote_ip = ip
+      tempfile = Tempfile.new "zebra_label"
+      tempfile << zpl
+      tempfile.close
+      @tempfile = tempfile
+      send_to_printer tempfile.path
     end
 
     private
 
     def check_existent_printers(printer)
       existent_printers = Cups.show_destinations
-      raise Exceptions::UnknownPrinter.new(printer) unless existent_printers.include?(printer)
+      raise UnknownPrinter.new(printer) unless existent_printers.include?(printer)
     end
 
     def send_to_printer(path)
