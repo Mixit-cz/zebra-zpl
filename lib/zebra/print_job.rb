@@ -14,6 +14,14 @@ module Zebra
       send_to_printer tempfile.path
     end
 
+    def raw_print(zpl, ip)
+      @remote_ip = ip
+      tempfile = Tempfile.new "zebra_label"
+      tempfile << zpl
+      tempfile.close
+      send_to_printer tempfile.path
+    end
+
     private
 
     def check_existent_printers(printer)
