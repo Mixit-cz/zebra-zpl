@@ -32,7 +32,7 @@ module Zebra
 
     def send_to_printer(path)
       platform_detector = PlatformDetector.new
-      puts "* * * * * * * * * * * * Sending file to printer #{@printer_name} at #{@remote_ip.present? ? @remote_ip : 'default location'} * * * * * * * * * * "
+      puts "* * * * * * * * * * * * Sending file to printer #{@printer} at #{@remote_ip.present? ? @remote_ip : 'default location'} * * * * * * * * * * "
       case platform_detector.os
         when :windows
           system(windows_command(path))
@@ -42,12 +42,12 @@ module Zebra
     end
 
     def unix_command(path)
-      cmd = "lp -d #{@printer_name} -o raw #{path}"
+      cmd = "lp -d #{@printer} -o raw #{path}"
       cmd + " -h #{@remote_ip}" if @remote_ip
     end
 
     def windows_command(path)
-      cmd = "rlpr -P #{@printer_name} -o raw #{path} 2>&1"
+      cmd = "rlpr -P #{@printer} -o raw #{path} 2>&1"
       cmd + " -H #{@remote_ip}" if @remote_ip
     end
   end
