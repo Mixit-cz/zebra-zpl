@@ -1,5 +1,3 @@
-require 'exceptions/uknown_printer'
-
 module Zebra
   class PrintJob
 
@@ -24,9 +22,24 @@ module Zebra
     end
 
     def send_to_printer(path)
-      puts "* * * * * * * * * * * * Sending file to printer #{@printer} at #{@remote_ip} * * * * * * * * * * "
-      result = system("rlpr -H #{@remote_ip} -P #{@printer} -o #{path} 2>&1") # try printing to LPD on windows machine first
-      system("lp -h #{@remote_ip} -d #{@printer} -o raw #{path}") if !result # print to unix (CUPS) if rlpr failed
+      platform_detector = PlatformDetector.new
+      puts "* * * * * * * * * * * * Sending file to printer #{@printer_name} at #{@remote_ip.present? ? @remote_ip : 'default location'} * * * * * * * * * * "
+      case platform_detector.os
+        when :windows
+          system(windows_command(path))
+        else
+          system(unix_command(path))
+      end
+    end
+
+    def unix_command(path)
+      cmd = "lp -d #{@printer_name} -o raw #{path}"
+      cmd + " -h #{@remote_ip}" if @remote_ip
+    end
+
+    def windows_command(path)
+      cmd = "rlpr -P #{@printer_name} -o raw #{path} 2>&1"
+      cmd + " -H #{@remote_ip}" if @remote_ip
     end
   end
 end

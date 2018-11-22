@@ -17,3 +17,5 @@ require 'zebra/print_job'
 require 'zebra/zpl/qrcode'
 require 'zebra/zpl/justification'
 require 'zebra/zpl/raw'
+require "zebra/platform_detector"
+require "zebra/exceptions/unknown_printer"
